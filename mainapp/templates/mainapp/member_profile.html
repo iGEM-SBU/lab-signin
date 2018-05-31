@@ -1,0 +1,23 @@
+{% extends 'mainapp/base.html' %}
+{% block title %}{{ profile_user.username }} | Bumpr{% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class="container text-center">
+        <div class="jumbotron jumbotron-fluid">
+            <h1>{{ member.get_name_display }}</h1>
+            <p>You have <b>{{ member.get_hours }}</b> hours on record</p>
+            <p>
+                {% if member.is_signed_in %}
+                    You've been signed in since {{ member.sign_in_time }}<br><br>
+                    <a class="btn btn-primary btn-lg" href="{% url 'member_signout' member_name=member.name %}" role="button">Sign out &raquo;</a>
+
+                {% else %}
+                    You were last active on {{ member.sign_out_time }}<br><br>
+                    <a class="btn btn-primary btn-lg" href="{% url 'member_signin' member_name=member.name %}" role="button">Sign in &raquo;</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

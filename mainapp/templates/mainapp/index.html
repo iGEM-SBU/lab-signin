@@ -1,0 +1,23 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-3">Lab Sign-in</h1>
+            <p>Select your name from the list below to get started.</p>
+                <p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <select name="member_name" class="form-control">
+                             {% for  member in member_list %}
+                                 <option value="{{ member.name }}">{{ member.get_name_display }}</option>
+                             {% endfor %}
+                        </select><br>
+                        <button type="submit" value="Submit" class="btn btn-primary">Log In</button>
+                    </form>
+                </p>
+        </div>
+    </div>
+
+{% endblock %}
