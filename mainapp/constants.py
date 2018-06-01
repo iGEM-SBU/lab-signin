@@ -1,3 +1,4 @@
+# Member Names (('username', 'verbose name'), ('username2', 'verbose name2'))
 MEMBER_NAMES = (
     ('paggarwal', 'Priya Aggarwal'),
     ('sbudhan', 'Stephanie Budhan'),
@@ -14,3 +15,9 @@ MEMBER_NAMES = (
     ('lvelikov', 'Lukas Velikov'),
     ('svincent', 'Sara Vincent')
 )
+
+# Google Sheets API/gspread Info
+SPREADSHEET_ID = '1WdJKTDyZWeEFwS2MT7nIvaqaRlMd9Sgut71cvNMYp_M'
+SCOPE = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+CREDENTIALS = 'gspread_cred.json'

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "agile-anagram-205818",
+  "private_key_id": "02a3c4ec8e05a57d9e3e52a0d32592dd1d24ea48",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC+0KanYZ5k15ww\ncOyVhsxcTpy/Wc7oQS8Ee+jb5+6QpEGtajVGStIOh+X9HtvUOWlfc3esk/oWS1mP\nOYndZcoEGD4aeLQtdnfq/IvKdhWLF0Bh7ZhLQ+NQT1gn2JGJB+U/4AYO0sAcPM4i\nip48TSRQZUAzPE5FFAW11cQTNjOqIFC3ECbkg0clY54nUgFCG3YsiV7SC8uWFObX\nm+lfGpQA3DaEVbgj6Vfzj8ayTVYaDhLt+cKJFSM0E/pGkpyxx0RMxpKV1OefpTMp\nQ06MU+cJyhcL2GIMaxsKvkUj4Kd9u9ZKkqlesqf7OxnJxtZkv8PEsTP7YWsv6agj\nQvNbbPOnAgMBAAECggEAWLcdpJioUe5EuejmtiZ0AT6zdevFXQphV85cV1GgAzO7\nLWtB1aqXuxXIAkVEo4kFytEehOhPz+m8e/CefocCw6CZzyjrbG+2FVTRkZIRNhfb\nYSxcMDIiD4a0T+JK19EJ7wazClVF6FsE495a72JWTeKlVKznHwrOFNqMTPpYTvHl\nwgeIhmIcFU6/HLw5qtR1JfXZKi0DP39tudxaDyNc5ww9vTv9jaXLwkEvJpZrKUpH\nKIq+d5DtdIXDaWOzOcEkQYjTszYxQksJxMH4ZqPyl12VnPHjlnW4W010JVQh2Bgz\nbkFLQd1oyqtobK6ixiFAXDrW+IJOA3QcyWfy330NQQKBgQDiSEZYeCdnaiiILzPe\n9KK3HJ2wF67bvqJhXrqbBH+gOjPSbyHhIiGm/ZjyX6gxV7KByG3kjpoYOR35Jfbm\nSZcA4qWfGFwCDQt23wJM/forxKXBDOC6U9AqkYjUisE0lNsYsy8cRJXlUnmsABaN\ngB+8yLx2S5xqRGIwQSFczCSUUQKBgQDX3/LNUKC/SfO32462pq4QUeqDfhrAyamx\niWWvHL1uuR8VaeTbcjNJ2sj+osAmFtD8R0E8Ey/OMLAi6Mt2cOO9kdfHWORiXhZd\nq/fM+RmD7OfeeAX75z2Snik6d7+6Da1PMGlV7TmOUN8+59M08OQx0gnJGgG+WNFI\nno752xVidwKBgGlvtd95NRsZuwMhw3Cq2rqpycwIbQCVRkJKina61OEK3aS7BbVK\nWxXdaovdCJjdPR7+Dj6GN8T7sDysdOv+9C6EbRnBlvWZsHLWHNNVMGF+gqF+Z6RK\nc1+yamhmsvnWNnS+4T+xsYqmMG11qQyL273yZuZT+vEFJh9H6cy8jnrRAoGBAKrK\naYR6x9LPpVzO/igP0yLiTFHgETZ51iG5/JMAf/b7y1Xbw87CmUVTLTYYeUEpSApw\nLXJkE6xj5NaZq293fRbcLgVvlLEmkzdk+NZYNhGj+waNmt5jYtl+/EtftnZyn61J\nNe1fk+u+nAFe1EDMXR31ePx78Okxx9JWb/PJmy+dAoGBAMvF2DCeJnFGPmTlzG0O\nBL2wYmn/obUph7dME8MEHBuvbmVZuxerCH9vNRycdEox5zwWC85tj39U+kZKNsC9\ngIgVxNojHfMS0OFQy/sBtR8XKkbt6hG5KU91r3/Tdc3XAcNPdZdzUMTq9tnj7o3i\nLjRj5YAzlmxRqugCpFpflqMI\n-----END PRIVATE KEY-----\n",
+  "client_email": "igem-lab-signin@agile-anagram-205818.iam.gserviceaccount.com",
+  "client_id": "101782246327056147732",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/igem-lab-signin%40agile-anagram-205818.iam.gserviceaccount.com"
+}
