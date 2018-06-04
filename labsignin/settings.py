@@ -32,7 +32,7 @@ DATABASES = {'default': dj_database_url.config(default='postgres://user:pass@loc
 #     }
 # }
 
-ALLOWED_HOSTS = ['labsignin.herokuapp.com/']
+ALLOWED_HOSTS = ['labsignin.herokuapp.com']
 
 # Application definition
 
