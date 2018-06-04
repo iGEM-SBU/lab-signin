@@ -7,6 +7,6 @@ urlpatterns = [
     path('member/<member_name>', views.view_member_profile, name="member_profile"),
     path('member/<member_name>/signin', views.member_signin, name="member_signin"),
     path('member/<member_name>/signout', views.member_signout, name="member_signout"),
-    #path('member/<member_name>/correction', views.member_time_correction, name="member_time_correction"),
+    path('member/<member_name>/correction', views.member_time_correction, name="member_time_correction"),
     # path('export', views.export_data, name="export_data")
 ]

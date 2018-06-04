@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, reverse, HttpResponseRedirect
 from django.utils import timezone
 from .models import Member
+from .forms import HoursForm
 from .constants import MEMBER_NAMES, SPREADSHEET_ID, SCOPE, START_DATE, END_DATE, G_SHEETS_ROW_SUM_COMMAND
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime as dt
@@ -37,6 +38,26 @@ def member_signout(request, member_name):
     return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
 
 
+def member_time_correction(request, member_name):
+    member = get_object_or_404(Member, name=member_name)
+    if request.method == 'POST':
+        form = HoursForm(request.POST)
+        if form.is_valid():
+            hours_to_add = float(form.cleaned_data.get('hours'))
+            print(hours_to_add)
+            new_signed_out_dt = member.sign_in_time + dt.timedelta(hours=hours_to_add)
+            print(new_signed_out_dt)
+            member.sign_out_time = new_signed_out_dt
+            member.total_time += int(hours_to_add * 60)
+            member.is_signed_in = False
+            member.save()
+            update_spreadsheet(member_name, hours_to_add)
+            return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
+    else:
+        form = HoursForm()
+    return render(request, 'mainapp/member_time_correction.html', {'member':member, 'form':form})
+
+
 # -----------------NON-VIEW FUNCTIONS----------------------------------------------
 
 
@@ -60,11 +81,13 @@ def verbose_list_from_choices(choices):
         ans.append(tup[1])
     return ans
 
+
 def short_list_from_choices(choices):
     ans = []
     for tup in  choices:
         ans.append(tup[0])
     return ans
+
 
 # You know what this does
 def is_sunday(date):
