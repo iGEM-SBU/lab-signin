@@ -24,7 +24,7 @@ SECRET_KEY = 'd6(=$(=1_n@%-mbfb7%ircw8%dazu1ih5sn=%bkniuweer*eb3'
 DEBUG = True# config('DEBUG', default=False, cast=bool)  # DEBUG = True
 
 
-DATABASES = {'default': dj_database_url.config(default='postgres://user:pass@localhost/dbname')}
+DATABASES = {'default': dj_database_url.config()}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
