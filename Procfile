@@ -1,1 +1,1 @@
-web: gunicorn lab-signin.wsgi --log-file -
+web: gunicorn labsignin.wsgi --log-file -
