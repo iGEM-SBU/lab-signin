@@ -18,16 +18,13 @@ from decouple import config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SECRET_KEY = 'd6(=$(=1_n@%-mbfb7%ircw8%dazu1ih5sn=%bkniuweer*eb3'
 
-SECRET_KEY = config('SECRET_KEY')  # SECRET_KEY = 'd6(=$(=1_n@%-mbfb7%ircw8%dazu1ih5sn=%bkniuweer*eb3'
+#SECRET_KEY = config('SECRET_KEY')
+DEBUG = True# config('DEBUG', default=False, cast=bool)  # DEBUG = True
 
-DEBUG = config('DEBUG', default=False, cast=bool)  # DEBUG = True
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
-}
+DATABASES = {'default': dj_database_url.config(default='postgres://user:pass@localhost/dbname')}
 
 ALLOWED_HOSTS = ['labsignin.herokuapp.com/']
 
