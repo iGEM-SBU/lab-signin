@@ -25,6 +25,12 @@ DEBUG = True# config('DEBUG', default=False, cast=bool)  # DEBUG = True
 
 
 DATABASES = {'default': dj_database_url.config(default='postgres://user:pass@localhost/dbname')}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 ALLOWED_HOSTS = ['labsignin.herokuapp.com/']
 
