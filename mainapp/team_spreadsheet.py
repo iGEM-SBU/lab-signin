@@ -1,5 +1,3 @@
-from googleapiclient.discovery import build
-from httplib2 import Http
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime as dt
 import gspread
@@ -21,7 +19,11 @@ MEMBER_NAMES = (
     ('svincent', 'Sara Vincent')
 )
 
-START_DATE = dt.datetime(2018, 6, 3)
+SPREADSHEET_ID = '1WdJKTDyZWeEFwS2MT7nIvaqaRlMd9Sgut71cvNMYp_M'
+SCOPE = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+
+START_DATE = dt.datetime(2018, 5, 27)
 END_DATE = dt.datetime(2018, 8, 12)
 G_SHEETS_ROW_SUM_COMMAND = '''=SUM(INDIRECT(CONCATENATE("B",ROW(),":H",ROW())))'''
 
@@ -45,6 +47,11 @@ def verbose_list_from_choices(choices):
         ans.append(tup[1])
     return ans
 
+def short_list_from_choices(choices):
+    ans = []
+    for tup in  choices:
+        ans.append(tup[0])
+    return ans
 
 # You know what this does
 def is_sunday(date):
@@ -62,7 +69,7 @@ def get_list_of_weeks(start_date, end_date):
             return ans
 
 
-def api_test():
+def generate_spreadsheet_template():
     list_of_weeks = get_list_of_weeks(START_DATE, END_DATE)
     spreadsheet_template = []
     for week in list_of_weeks:
@@ -74,10 +81,6 @@ def api_test():
             header += [0]*7  # [0,0,0,0,0,0,0]
             header.append(G_SHEETS_ROW_SUM_COMMAND)
         spreadsheet_template += header
-
-    SPREADSHEET_ID = '1WdJKTDyZWeEFwS2MT7nIvaqaRlMd9Sgut71cvNMYp_M'
-    SCOPE = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name('gspread_creds.json', SCOPE)
     gc = gspread.authorize(credentials)
     wks = gc.open_by_key(SPREADSHEET_ID)
@@ -89,11 +92,18 @@ def api_test():
 
     worksheet.update_cells(cell_list, value_input_option='USER_ENTERED')
 
+def update_spreadsheet(username, value):
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('gspread_creds.json', SCOPE)
+    gc = gspread.authorize(credentials)
+    wks = gc.open_by_key(SPREADSHEET_ID)
+    worksheet = wks.sheet1
+    current_date = '{d.month}/{d.day}'.format(d=dt.datetime.now())
+    print(current_date)
+    current_date_cell = worksheet.findall(current_date)[0]
+    row_index = short_list_from_choices(MEMBER_NAMES).index(username) + 1
+    user_cell_row = current_date_cell.row + row_index
+    user_cell_col = current_date_cell.col
+    worksheet.update_cell(user_cell_row, user_cell_col, value)
 
+#update_spreadsheet('lvelikov', 1)
 
-
-api_test()
-# print(get_week_list_dates_from(dt.datetime(2018,6,3)))
-# print(verbose_list_from_choices(MEMBER_NAMES))
-#print(get_day_one_week_from(dt.datetime(2018,6,3)))
-# print(get_list_of_weeks(dt.datetime(2018,6,3), dt.datetime(2018,8,12)))
