@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, reverse, HttpResponseRed
 from django.utils import timezone
 from .models import Member
 from .forms import HoursForm
-from .constants import MEMBER_NAMES, SPREADSHEET_ID, SCOPE, START_DATE, END_DATE, G_SHEETS_ROW_SUM_COMMAND
+from .constants import MEMBER_NAMES, SPREADSHEET_ID, SCOPE, START_DATE, END_DATE, G_SHEETS_ROW_SUM_COMMAND, GSPREAD_CREDS
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime as dt
 import gspread
@@ -35,6 +35,7 @@ def member_signout(request, member_name):
     member.sign_out(timezone.now())
     member.save()
     update_spreadsheet(member_name, member.last_time_block/60)
+    verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time)
     return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
 
 
@@ -52,6 +53,7 @@ def member_time_correction(request, member_name):
             member.is_signed_in = False
             member.save()
             update_spreadsheet(member_name, hours_to_add)
+            verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time, 'Manually Entered')
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form = HoursForm()
@@ -117,7 +119,11 @@ def generate_spreadsheet_template():
             header += [0]*7  # [0,0,0,0,0,0,0]
             header.append(G_SHEETS_ROW_SUM_COMMAND)
         spreadsheet_template += header
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('gspread_creds.json', SCOPE)
+    dirname = os.path.dirname(__file__)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        os.path.join(dirname, GSPREAD_CREDS),
+        SCOPE
+    )
     gc = gspread.authorize(credentials)
     wks = gc.open_by_key(SPREADSHEET_ID)
     worksheet = wks.sheet1
@@ -132,7 +138,7 @@ def generate_spreadsheet_template():
 def update_spreadsheet(username, value):
     dirname = os.path.dirname(__file__)
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        os.path.join(dirname, 'gspread_creds.json'),
+        os.path.join(dirname, GSPREAD_CREDS),
         SCOPE
     )
     gc = gspread.authorize(credentials)
@@ -144,3 +150,15 @@ def update_spreadsheet(username, value):
     user_cell_row = current_date_cell.row + row_index
     user_cell_col = current_date_cell.col
     worksheet.update_cell(user_cell_row, user_cell_col, value)
+
+
+def verbose_log(member_name, signed_in, signed_out, notes='Successful with no errors'):
+    dirname = os.path.dirname(__file__)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        os.path.join(dirname, GSPREAD_CREDS),
+        SCOPE
+    )
+    gc = gspread.authorize(credentials)
+    wks = gc.open_by_key(SPREADSHEET_ID)
+    worksheet = wks.worksheet("Verbose Log")
+    worksheet.append_row([member_name, str(signed_in), str(signed_out), str(signed_out - signed_in), notes], value_input_option='USER_ENTERED')

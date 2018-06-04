@@ -25,4 +25,5 @@ END_DATE = dt.datetime(2018, 8, 12)
 SPREADSHEET_ID = '1WdJKTDyZWeEFwS2MT7nIvaqaRlMd9Sgut71cvNMYp_M'
 SCOPE = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
+GSPREAD_CREDS = 'gspread_creds.json'
 G_SHEETS_ROW_SUM_COMMAND = '''=SUM(INDIRECT(CONCATENATE("B",ROW(),":H",ROW())))'''
