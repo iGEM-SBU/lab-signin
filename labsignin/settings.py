@@ -29,7 +29,7 @@ DATABASES = {
     )
 }
 
-ALLOWED_HOSTS = ['https://labsignin.herokuapp.com/']
+ALLOWED_HOSTS = ['labsignin.herokuapp.com/']
 
 # Application definition
 
