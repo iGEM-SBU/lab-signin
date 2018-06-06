@@ -149,7 +149,8 @@ def update_spreadsheet(username, value):
     row_index = short_list_from_choices(MEMBER_NAMES).index(username) + 1
     user_cell_row = current_date_cell.row + row_index
     user_cell_col = current_date_cell.col
-    worksheet.update_cell(user_cell_row, user_cell_col, value)
+    user_cell_value = float(worksheet.cell(user_cell_row, user_cell_col).value)
+    worksheet.update_cell(user_cell_row, user_cell_col, user_cell_value+value)
 
 
 def verbose_log(member_name, signed_in, signed_out, notes='Successful with no errors'):
