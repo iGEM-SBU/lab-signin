@@ -60,6 +60,11 @@ def member_time_correction(request, member_name):
     return render(request, 'mainapp/member_time_correction.html', {'member':member, 'form':form})
 
 
+def whos_in(request):
+    member_list = Member.objects.all()
+    return render(request, 'mainapp/whos_in.html', {'member_list': member_list})
+
+
 # -----------------NON-VIEW FUNCTIONS----------------------------------------------
 
 
