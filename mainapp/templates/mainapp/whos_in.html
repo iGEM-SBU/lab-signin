@@ -1,0 +1,36 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="container text-center">
+        <div class="jumbotron jumbotron-fluid">
+            <h1>At a Glance</h1><br>
+            <div class="container">
+                {% for member in member_list %}
+                    {% if member.is_signed_in %}
+                        <p>
+                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ member.name }}" aria-expanded="false" aria-controls="{{ member.name }}">{{ member.get_name_display }}</button>
+                            <div class="collapse" id="{{ member.name }}">
+                                <div class="card card-body">
+                                    Since <b>{{ member.sign_in_time }}</b>
+                                </div>
+                            </div>
+                        </p>
+                    {% endif %}
+                {% endfor %}
+                {% for member in member_list %}
+                    {% if not member.is_signed_in %}
+                        <p>
+                            <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#{{ member.name }}" aria-expanded="false" aria-controls="{{ member.name }}">{{ member.get_name_display }}</button>
+                            <div class="collapse" id="{{ member.name }}">
+                                <div class="card card-body">
+                                    Last seen <b>{{ member.sign_out_time }}</b>
+                                </div>
+                            </div>
+                        </p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
