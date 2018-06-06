@@ -32,7 +32,7 @@ DATABASES = {'default': dj_database_url.config()}
 #     }
 # }
 
-ALLOWED_HOSTS = ['labsignin.herokuapp.com']
+ALLOWED_HOSTS = ['labsignin.herokuapp.com', 'localhost']
 
 # Application definition
 
@@ -77,17 +77,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'labsignin.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 
 # Password validation
