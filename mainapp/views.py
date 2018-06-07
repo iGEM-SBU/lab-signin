@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, reverse, HttpResponseRedirect
 from django.utils import timezone
 from .models import Member
-from .forms import HoursForm
+from .forms import HoursForm, SignInTimeForm
 from .constants import MEMBER_NAMES, SPREADSHEET_ID, SCOPE, START_DATE, END_DATE, G_SHEETS_ROW_SUM_COMMAND, GSPREAD_CREDS
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime as dt
@@ -58,6 +58,23 @@ def member_time_correction(request, member_name):
     else:
         form = HoursForm()
     return render(request, 'mainapp/member_time_correction.html', {'member':member, 'form':form})
+
+
+def member_time_correction_in(request, member_name):
+    member = get_object_or_404(Member, name=member_name)
+    if request.method == 'POST':
+        form = SignInTimeForm(request.POST)
+        if form.is_valid():
+            new_time_in = form.cleaned_data.get('time_signed_in')
+            new_dt_in = dt.datetime.combine(dt.date.today(), new_time_in)
+            member.sign_in_time = new_dt_in
+            member.is_signed_in = True
+            member.save()
+            verbose_log(member.get_name_display(), member.sign_in_time, dt.datetime.now(), 'Manually Entered')
+            return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
+    else:
+        form = SignInTimeForm()
+    return render(request, 'mainapp/member_time_correction_in.html', {'member':member, 'form':form})
 
 
 def whos_in(request):

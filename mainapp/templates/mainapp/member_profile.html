@@ -9,12 +9,13 @@
             <p>
                 {% if member.is_signed_in %}
                     You've been signed in since {{ member.sign_in_time }}<br><br>
-                    <a class="btn btn-primary btn-lg" href="{% url 'member_signout' member_name=member.name %}" role="button">Sign out &raquo;</a>
-                    <a class="btn btn-primary btn-lg" href="{% url 'member_time_correction' member_name=member.name %}" role="button">Forgot to sign out? &raquo;</a>
+                    <a class="btn btn-primary btn-lg" href="{% url 'member_signout' member_name=member.name %}" role="button">Sign <b>out</b> &raquo;</a>
+                    <a class="btn btn-outline-primary btn-lg" href="{% url 'member_time_correction' member_name=member.name %}" role="button">Forgot to sign out? &raquo;</a>
 
                 {% else %}
                     You were last active on {{ member.sign_out_time }}<br><br>
-                    <a class="btn btn-primary btn-lg" href="{% url 'member_signin' member_name=member.name %}" role="button">Sign in &raquo;</a>
+                    <a class="btn btn-primary btn-lg" href="{% url 'member_signin' member_name=member.name %}" role="button">Sign <b>in</b> &raquo;</a>
+                    <a class="btn btn-outline-primary btn-lg" href="{% url 'member_time_correction_in' member_name=member.name %}" role="button">Forgot to sign in? &raquo;</a>
                 {% endif %}
             </p>
         </div>
