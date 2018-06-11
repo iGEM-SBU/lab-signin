@@ -6,9 +6,11 @@
         <div class="jumbotron jumbotron-fluid">
             <h1>Correcting Sign-in Time for {{ member.get_name_display }}</h1>
             <div class="container">
+                <br>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form | crispy }}
+                    <label for="time_signed_in">When did you sign in?</label>
+                    <input type="time" name="time_signed_in" class="form-control"><br>
                     <button type="submit" value="Submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>

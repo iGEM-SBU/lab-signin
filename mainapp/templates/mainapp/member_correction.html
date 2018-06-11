@@ -8,7 +8,10 @@
             <div class="container">
                 <form method="post">
                     {% csrf_token %}
-                    {{ form | crispy }}
+                    <label for="date">What day did you come in?</label>
+                    <input type="date" name="date" class="form-control dateinput" required id="id_date"><br>
+                    <label for="id_hours">How many hours did you do?</label>
+                    <input type="number" name="hours" min="0" max="12" step="0.01" class="numberinput form-control" required id="id_hours" placeholder="Enter a number here"/><br>
                     <button type="submit" value="Submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
