@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, reverse, HttpResponseRedirect
 from django.utils import timezone
-from .models import Member
-from .forms import HoursForm, SignInTimeForm
+from .models import Member, TimelineBlock
+from .forms import HoursForm, SignInTimeForm, BigTimeCorrectionForm, TimelineForm
 from .constants import MEMBER_NAMES, SPREADSHEET_ID, SCOPE, START_DATE, END_DATE, G_SHEETS_ROW_SUM_COMMAND, GSPREAD_CREDS
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime as dt
@@ -20,7 +20,23 @@ def index(request):
 
 def view_member_profile(request, member_name):
     member = get_object_or_404(Member, name=member_name)
-    return render(request, 'mainapp/member_profile.html', {'member':member})
+    if request.method == 'POST':
+        form = TimelineForm(request.POST)
+        if form.is_valid():
+            text = form.cleaned_data.get('text')
+            if len(text) == 0:
+                return member_signout(request, member_name)
+            newBlock = TimelineBlock()
+            newBlock.content = text
+            newBlock.member = member
+            member.sign_out(timezone.now())
+            newBlock.header = member.sign_in_time.strftime("%B %d, %Y")
+            newBlock.subtitle = timeblock_subtitle_format(member.sign_in_time, member.sign_out_time)
+            newBlock.save()
+            return member_signout(request, member_name)
+    form = TimelineForm()
+    timeline_list = list(reversed(TimelineBlock.objects.filter(member=member)))
+    return render(request, 'mainapp/member_profile.html', {'member': member, 'form': form, 'timeline_list': timeline_list})
 
 
 def member_signin(request, member_name):
@@ -53,7 +69,7 @@ def member_time_correction(request, member_name):
             member.is_signed_in = False
             member.save()
             update_spreadsheet(member_name, hours_to_add)
-            verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time, 'Manually Entered')
+            verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time, 'Manually Entered (Sign out)')
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form = HoursForm()
@@ -70,16 +86,40 @@ def member_time_correction_in(request, member_name):
             member.sign_in_time = new_dt_in
             member.is_signed_in = True
             member.save()
-            verbose_log(member.get_name_display(), member.sign_in_time, dt.datetime.now(), 'Manually Entered')
+            verbose_log(member.get_name_display(), member.sign_in_time, dt.datetime.now(), 'Manually Entered (Sign in)')
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form = SignInTimeForm()
-    return render(request, 'mainapp/member_time_correction_in.html', {'member':member, 'form':form})
+    return render(request, 'mainapp/member_time_correction_in.html', {'member': member, 'form': form})
+
+
+def member_correction(request, member_name):
+    member = get_object_or_404(Member, name=member_name)
+    if request.method == 'POST':
+        form = BigTimeCorrectionForm(request.POST)
+        if form.is_valid():
+            date = form.cleaned_data.get('date')
+            hours = float(form.cleaned_data.get('hours'))
+            date = dt.datetime.combine(date, dt.datetime.now().time())
+            update_spreadsheet_by_day(member.name, hours, date)
+            member.total_time += int(hours*60)
+            member.save()
+            verbose_log(member.get_name_display(), timezone.now(), timezone.now(), 'Manually Entered (Backlog)')
+            return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
+    else:
+        form =BigTimeCorrectionForm
+    return render(request, 'mainapp/member_correction.html', {'member':member, 'form':form})
 
 
 def whos_in(request):
     member_list = Member.objects.all()
     return render(request, 'mainapp/whos_in.html', {'member_list': member_list})
+
+
+def group_timeline(request):
+    timelinelist = list(reversed(TimelineBlock.objects.all()))
+    return render(request, 'mainapp/group_timeline.html', {'timelinelist': timelinelist})
+
 
 
 # -----------------NON-VIEW FUNCTIONS----------------------------------------------
@@ -129,6 +169,10 @@ def get_list_of_weeks(start_date, end_date):
             return ans
 
 
+def timeblock_subtitle_format(time1, time2):
+    return time1.strftime('%I:%M') + ' - ' + time2.strftime('%I:%M')
+
+
 def generate_spreadsheet_template():
     list_of_weeks = get_list_of_weeks(START_DATE, END_DATE)
     spreadsheet_template = []
@@ -155,6 +199,24 @@ def generate_spreadsheet_template():
         cell.value = new_cell_value
 
     worksheet.update_cells(cell_list, value_input_option='USER_ENTERED')
+
+
+def update_spreadsheet_by_day(username, value, day):
+    dirname = os.path.dirname(__file__)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        os.path.join(dirname, GSPREAD_CREDS),
+        SCOPE
+    )
+    gc = gspread.authorize(credentials)
+    wks = gc.open_by_key(SPREADSHEET_ID)
+    worksheet = wks.sheet1
+    current_date = '{d.month}/{d.day}'.format(d=day)
+    current_date_cell = worksheet.findall(current_date)[0]
+    row_index = short_list_from_choices(MEMBER_NAMES).index(username) + 1
+    user_cell_row = current_date_cell.row + row_index
+    user_cell_col = current_date_cell.col
+    user_cell_value = float(worksheet.cell(user_cell_row, user_cell_col).value)
+    worksheet.update_cell(user_cell_row, user_cell_col, user_cell_value+value)
 
 
 def update_spreadsheet(username, value):

@@ -35,4 +35,23 @@ class Member(models.Model):
         self.is_signed_in = False
 
     def get_hours(self):
-        return self.total_time/60
+        hours = self.total_time/60
+        if hours < 10:
+            return '{0:.3g}'.format(hours)
+        elif hours < 100:
+            return '{0:.4g}'.format(hours)
+        elif hours < 1000:
+            return '{0:.5g}'.format(hours)
+        return '{0:.6g}'.format(hours)
+
+
+
+class TimelineBlock(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    header = models.CharField(max_length=25, default='No Header')
+    subtitle = models.CharField(max_length=30, default='No Subtitle')
+    content = models.CharField(max_length=280, default='No Content')
+
+    def __str__(self):
+        return 'By '+self.member+': '+self.header+' '+self.content
+

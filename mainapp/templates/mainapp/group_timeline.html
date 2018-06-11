@@ -1,0 +1,22 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="container text-center">
+        <div class="jumbotron jumbotron-fluid">
+            <h1>Group Timeline</h1><br>
+        </div>
+        <div class="container">
+            {% for tlblock in timelinelist %}
+                <div class="card">
+                    <h5 class="card-header bg-primary text-white"><b>{{ tlblock.member.get_name_display }}</b> · {{ tlblock.header }}</h5>
+                    <div class="card-body">
+                        <h6 class="small">{{ tlblock.subtitle }}</h6>
+                        <p class="card-text">{{ tlblock.content }}</p>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

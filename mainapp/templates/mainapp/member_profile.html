@@ -1,7 +1,7 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
 {% block content %}
-
+{% load crispy_forms_tags %}
     <div class="container text-center">
         <div class="jumbotron jumbotron-fluid">
             <h1>{{ member.get_name_display }}</h1>
@@ -9,9 +9,13 @@
             <p>
                 {% if member.is_signed_in %}
                     You've been signed in since {{ member.sign_in_time }}<br><br>
-                    <a class="btn btn-primary btn-lg" href="{% url 'member_signout' member_name=member.name %}" role="button">Sign <b>out</b> &raquo;</a>
-                    <a class="btn btn-outline-primary btn-lg" href="{% url 'member_time_correction' member_name=member.name %}" role="button">Forgot to sign out? &raquo;</a>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="container-fluid"><input type="text" name="text" class="form-control" placeholder="(Optional) Describe what you did!"><br></div>
+                        <button type="submit" value="Submit" class="btn btn-primary btn-lg">Sign <b>out</b> &raquo;</button>
+                        <a class="btn btn-outline-primary btn-lg" href="{% url 'member_time_correction' member_name=member.name %}" role="button">Forgot to sign out? &raquo;</a>
 
+                    </form>
                 {% else %}
                     You were last active on {{ member.sign_out_time }}<br><br>
                     <a class="btn btn-primary btn-lg" href="{% url 'member_signin' member_name=member.name %}" role="button">Sign <b>in</b> &raquo;</a>
@@ -19,6 +23,19 @@
                 {% endif %}
             </p>
         </div>
+        <h3>Timeline</h3>
+        {% for tlblock in timeline_list %}
+            <div class="card">
+                <h5 class="card-header bg-primary text-white">{{ tlblock.header }}</h5>
+                <div class="card-body">
+                    <h6 class="small">{{ tlblock.subtitle }}</h6>
+                    <p class="card-text">{{ tlblock.content }}</p>
+                </div>
+            </div>
+            <br>
+        {% endfor %}
+        <a class="btn btn-primary btn-lg" href="{% url 'member_correction' member_name=member.name %}" role="button">Backlog Hours</a>
     </div>
+    <br>
 
 {% endblock %}
