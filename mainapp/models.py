@@ -45,6 +45,10 @@ class Member(models.Model):
         return '{0:.6g}'.format(hours)
 
 
+    def forgot_to_sign_out(self):
+        return (self.sign_in_time - self.sign_out_time).seconds//3600 > 12
+
+
 
 class TimelineBlock(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)

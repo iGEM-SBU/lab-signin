@@ -2,7 +2,17 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
+
     <div class="container text-center">
+        {% if member.forgot_to_sign_out %}
+            <br>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                Looks like you forgot to sign out! Use the <b>Forgot to Sign Out</b> feature to fix things up.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
         <div class="jumbotron jumbotron-fluid">
             <h1>{{ member.get_name_display }}</h1>
             <p>You have <b>{{ member.get_hours }}</b> hours on record</p>
