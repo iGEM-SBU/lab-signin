@@ -46,7 +46,7 @@ class Member(models.Model):
 
 
     def forgot_to_sign_out(self):
-        return (self.sign_in_time - self.sign_out_time).seconds//3600 > 12
+        return (self.is_signed_in) and ((self.sign_in_time - self.sign_out_time).seconds//3600 > 12)
 
 
 
