@@ -1,3 +1,5 @@
+import threading
+
 from django.shortcuts import render, get_object_or_404, reverse, HttpResponseRedirect
 from django.utils import timezone
 from .models import Member, TimelineBlock
@@ -26,17 +28,23 @@ def view_member_profile(request, member_name):
             text = form.cleaned_data.get('text')
             if len(text) == 0:
                 return member_signout(request, member_name)
-            newBlock = TimelineBlock()
-            newBlock.content = text
-            newBlock.member = member
-            member.sign_out(timezone.now())
-            newBlock.header = member.sign_in_time.strftime("%B %d, %Y")
-            newBlock.subtitle = timeblock_subtitle_format(member.sign_in_time, member.sign_out_time)
-            newBlock.save()
+            t = threading.Thread(target=timeline_block_bg_thread, args=[member, text])
+            t.setDaemon(False)
+            t.start()
             return member_signout(request, member_name)
     form = TimelineForm()
     timeline_list = list(reversed(TimelineBlock.objects.filter(member=member)))
     return render(request, 'mainapp/member_profile.html', {'member': member, 'form': form, 'timeline_list': timeline_list})
+
+
+def timeline_block_bg_thread(member, text):
+    newBlock = TimelineBlock()
+    newBlock.content = text
+    newBlock.member = member
+    member.sign_out(timezone.now())
+    newBlock.header = member.sign_in_time.strftime("%B %d, %Y")
+    newBlock.subtitle = timeblock_subtitle_format(member.sign_in_time, member.sign_out_time)
+    newBlock.save()
 
 
 def member_signin(request, member_name):
@@ -50,9 +58,15 @@ def member_signout(request, member_name):
     member = get_object_or_404(Member, name=member_name)
     member.sign_out(timezone.now())
     member.save()
-    update_spreadsheet(member_name, member.last_time_block/60)
-    verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time)
+    t = threading.Thread(target=member_signout_bg_thread, args=[member, member_name])
+    t.setDaemon(False)
+    t.start()
     return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
+
+
+def member_signout_bg_thread(member, member_name):
+    update_spreadsheet(member_name, member.last_time_block / 60)
+    verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time)
 
 
 def member_time_correction(request, member_name):
@@ -60,16 +74,9 @@ def member_time_correction(request, member_name):
     if request.method == 'POST':
         form = HoursForm(request.POST)
         if form.is_valid():
-            hours_to_add = float(form.cleaned_data.get('hours'))
-            print(hours_to_add)
-            new_signed_out_dt = member.sign_in_time + dt.timedelta(hours=hours_to_add)
-            print(new_signed_out_dt)
-            member.sign_out_time = new_signed_out_dt
-            member.total_time += int(hours_to_add * 60)
-            member.is_signed_in = False
-            member.save()
-            update_spreadsheet(member_name, hours_to_add)
-            verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time, 'Manually Entered (Sign out)')
+            t = threading.Thread(target=member_time_correction_bg_thread, args=[member, member_name, form])
+            t.setDaemon(False)
+            t.start()
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form = HoursForm()
@@ -81,12 +88,9 @@ def member_time_correction_in(request, member_name):
     if request.method == 'POST':
         form = SignInTimeForm(request.POST)
         if form.is_valid():
-            new_time_in = form.cleaned_data.get('time_signed_in')
-            new_dt_in = dt.datetime.combine(dt.date.today(), new_time_in)
-            member.sign_in_time = new_dt_in
-            member.is_signed_in = True
-            member.save()
-            verbose_log(member.get_name_display(), member.sign_in_time, dt.datetime.now(), 'Manually Entered (Sign in)')
+            t = threading.Thread(target=member_time_correction_in_bg_thread, args=[member, form])
+            t.setDaemon(False)
+            t.start()
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form = SignInTimeForm()
@@ -98,13 +102,9 @@ def member_correction(request, member_name):
     if request.method == 'POST':
         form = BigTimeCorrectionForm(request.POST)
         if form.is_valid():
-            date = form.cleaned_data.get('date')
-            hours = float(form.cleaned_data.get('hours'))
-            date = dt.datetime.combine(date, dt.datetime.now().time())
-            update_spreadsheet_by_day(member.name, hours, date)
-            member.total_time += int(hours*60)
-            member.save()
-            verbose_log(member.get_name_display(), timezone.now(), timezone.now(), 'Manually Entered (Backlog)')
+            t = threading.Thread(target=member_correction_bg_thread, args=[member, form])
+            t.setDaemon(False)
+            t.start()
             return HttpResponseRedirect(reverse('member_profile', args=[member.name]))
     else:
         form =BigTimeCorrectionForm
@@ -121,8 +121,39 @@ def group_timeline(request):
     return render(request, 'mainapp/group_timeline.html', {'timelinelist': timelinelist})
 
 
-
 # -----------------NON-VIEW FUNCTIONS----------------------------------------------
+
+
+def member_time_correction_bg_thread(member, member_name, form):
+    hours_to_add = float(form.cleaned_data.get('hours'))
+    print(hours_to_add)
+    new_signed_out_dt = member.sign_in_time + dt.timedelta(hours=hours_to_add)
+    print(new_signed_out_dt)
+    member.sign_out_time = new_signed_out_dt
+    member.total_time += int(hours_to_add * 60)
+    member.is_signed_in = False
+    member.save()
+    update_spreadsheet(member_name, hours_to_add)
+    verbose_log(member.get_name_display(), member.sign_in_time, member.sign_out_time, 'Manually Entered (Sign out)')
+
+
+def member_time_correction_in_bg_thread(member, form):
+    new_time_in = form.cleaned_data.get('time_signed_in')
+    new_dt_in = dt.datetime.combine(dt.date.today(), new_time_in)
+    member.sign_in_time = new_dt_in
+    member.is_signed_in = True
+    member.save()
+    verbose_log(member.get_name_display(), member.sign_in_time, dt.datetime.now(), 'Manually Entered (Sign in)')
+
+
+def member_correction_bg_thread(member, form):
+    date = form.cleaned_data.get('date')
+    hours = float(form.cleaned_data.get('hours'))
+    date = dt.datetime.combine(date, dt.datetime.now().time())
+    update_spreadsheet_by_day(member.name, hours, date)
+    member.total_time += int(hours * 60)
+    member.save()
+    verbose_log(member.get_name_display(), timezone.now(), timezone.now(), 'Manually Entered (Backlog)')
 
 
 # get_day_one_week_from(dt.datetime(2018,6,3)) returns 2018-06-10 00:00:00 (datetime object)
